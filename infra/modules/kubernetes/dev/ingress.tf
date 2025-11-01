@@ -5,23 +5,18 @@ resource "helm_release" "ingress_nginx_dev" {
   namespace        = "ingress-dev"
   create_namespace = true
 
-  set {
-    name  = "controller.ingressClassResource.name"
-    value = "nginx-dev"
-  }
-
-  set {
-    name  = "controller.ingressClassResource.controllerValue"
-    value = "k8s.io/ingress-nginx-dev"
-  }
-
-  set {
-    name  = "controller.service.loadBalancerIP"
-    value = var.dev_ingress_ip
-  }
-
-  set {
-    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
-    value = var.resource_group_name
-  }
+  set = [
+    {
+      name  = "controller.ingressClassResource.name"
+      value = "nginx-dev"
+    },
+    {
+      name  = "controller.service.loadBalancerIP"
+      value = var.dev_ingress_ip
+    },
+    {
+      name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
+      value = var.resource_group_name
+    }
+  ]
 }

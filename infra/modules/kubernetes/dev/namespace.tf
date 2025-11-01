@@ -7,3 +7,9 @@ resource "kubernetes_namespace" "marketflow_dev" {
     }
   }
 }
+
+resource "kubernetes_namespace" "test" {
+  metadata {
+    name = "test"
+  }
+}

@@ -1,16 +1,23 @@
 ###########################################################
-# Demo Application (httpbin) with TLS ingress
+# Demo Application (httpbin) with TLS ingress for DEV
 ###########################################################
-resource "kubernetes_namespace" "demo" {
+
+# Namespace for dev environment
+resource "kubernetes_namespace" "marketflow_dev" {
   metadata {
-    name = "demo"
+    name = "marketflow-dev"
+    labels = {
+      environment = "dev"
+      project     = "marketflow"
+    }
   }
 }
 
+# Deployment
 resource "kubernetes_deployment" "httpbin" {
   metadata {
     name      = "httpbin"
-    namespace = kubernetes_namespace.demo.metadata[0].name
+    namespace = kubernetes_namespace.marketflow_dev.metadata[0].name
     labels = {
       app = "httpbin"
     }
@@ -44,10 +51,11 @@ resource "kubernetes_deployment" "httpbin" {
   }
 }
 
+# Service
 resource "kubernetes_service" "httpbin" {
   metadata {
     name      = "httpbin"
-    namespace = kubernetes_namespace.demo.metadata[0].name
+    namespace = kubernetes_namespace.marketflow_dev.metadata[0].name
   }
 
   spec {
@@ -59,23 +67,25 @@ resource "kubernetes_service" "httpbin" {
       port        = 80
       target_port = 80
     }
+
     type = "ClusterIP"
   }
 }
 
+# Ingress
 resource "kubernetes_ingress_v1" "httpbin" {
   metadata {
     name      = "httpbin"
-    namespace = kubernetes_namespace.demo.metadata[0].name
+    namespace = kubernetes_namespace.marketflow_dev.metadata[0].name
     annotations = {
-      "kubernetes.io/ingress.class"         = "nginx"
-      "cert-manager.io/cluster-issuer"      = "letsencrypt-staging"
+      "kubernetes.io/ingress.class"    = "nginx-dev"
+      "cert-manager.io/cluster-issuer" = "homelab-ca-issuer"
     }
   }
 
   spec {
     rule {
-      host = "httpbin.${var.domain}"
+      host = "httpbin.dev.ai.home"
       http {
         path {
           path      = "/"
@@ -93,7 +103,7 @@ resource "kubernetes_ingress_v1" "httpbin" {
     }
 
     tls {
-      hosts       = ["httpbin.${var.domain}"]
+      hosts       = ["httpbin.dev.ai.home"]
       secret_name = "httpbin-tls"
     }
   }
