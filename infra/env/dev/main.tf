@@ -56,20 +56,6 @@ module "storage" {
   depends_on          = [module.aks]
 }
 
-module "role_assignments" {
-  source = "../../modules/azure/role_assignments"
-
-  resource_group_id = azurerm_resource_group.rg.id
-  keyvault_id       = module.keyvault.keyvault_id
-  acr_id            = module.acr.acr_id
-
-  # AKS Managed Identity
-  principal_id     = module.aks.aks_identity_principal_id
-  aks_principal_id = module.aks.aks_identity_principal_id
-
-  depends_on = [module.aks]
-}
-
 module "kubernetes_dev" {
   source              = "../../modules/kubernetes/dev"
   resource_group_name = var.resource_group_name
@@ -88,8 +74,22 @@ module "kubernetes_dev" {
   depends_on = [module.aks]
 }
 
+module "role_assignments" {
+  source = "../../modules/phase/role_assignments"
+
+  resource_group_id = azurerm_resource_group.rg.id
+  keyvault_id       = module.keyvault.keyvault_id
+  acr_id            = module.acr.acr_id
+
+  # AKS Managed Identity
+  principal_id     = module.aks.aks_identity_principal_id
+  aks_principal_id = module.aks.aks_identity_principal_id
+
+  depends_on = [module.aks]
+}
+
 module "eventhub" {
-  source              = "../../modules/eventhub"
+  source              = "../../modules/phase/eventhub"
   project_name        = var.project_name
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
