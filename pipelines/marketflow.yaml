@@ -2,141 +2,49 @@ trigger:
   branches:
     include:
       - main
-  paths:
-    include:
-      - infra/**
+
+pool:
+  vmImage: 'ubuntu-latest'
 
 variables:
-  TF_VERSION: '1.9.8'
-  AZURE_SERVICE_CONNECTION: 'AzureServiceConnection'
-  TF_WORKING_DIR: 'infra/env/dev0'
-  CLUSTER_NAME: 'marketflow0-aks'
-  CLUSTER_RG: 'marketflow0-rg'
+  TF_WORKING_DIR: 'infra/env/dev.0'
+  ARM_USE_MSI: false
 
 stages:
-  # ================================
-  # STAGE 1 — TERRAFORM (Infrastructure)
-  # ================================
-  - stage: Terraform
-    displayName: "Provision Azure Infrastructure"
-    jobs:
-      - job: terraform
-        displayName: "Terraform Apply"
-        pool:
-          vmImage: ubuntu-latest
+- stage: Terraform_Deploy
+  displayName: 'Terraform Init & Apply'
+  jobs:
+  - job: deploy
+    displayName: 'Deploy Azure Infra'
+    steps:
+    - checkout: self
 
-        steps:
-          - checkout: self
+    - task: TerraformInstaller@1
+      displayName: 'Install Terraform'
+      inputs:
+        terraformVersion: '1.9.5'
 
-          - task: TerraformInstaller@1
-            displayName: "Install Terraform"
-            inputs:
-              terraformVersion: $(TF_VERSION)
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Init'
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        backendServiceArm: 'marketflow-azure-connection'
 
-          - task: TerraformTaskV4@4
-            displayName: "Terraform Init"
-            inputs:
-              provider: 'azurerm'
-              command: 'init'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              backendServiceArm: '$(AZURE_SERVICE_CONNECTION)'
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Plan'
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        environmentServiceNameAzureRM: 'marketflow-azure-connection'
 
-          - task: TerraformTaskV4@4
-            displayName: "Terraform Plan"
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-              environmentServiceNameAzureRM: '$(AZURE_SERVICE_CONNECTION)'
-              workingDirectory: '$(TF_WORKING_DIR)'
-
-          - task: TerraformTaskV4@4
-            displayName: "Terraform Apply"
-            inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              environmentServiceNameAzureRM: '$(AZURE_SERVICE_CONNECTION)'
-              workingDirectory: '$(TF_WORKING_DIR)'
-              args: '-auto-approve'
-
-  # ================================
-  # STAGE 2 — KUBERNETES BOOTSTRAP
-  # ================================
-  - stage: Bootstrap
-    displayName: "Bootstrap AKS Cluster"
-    dependsOn: Terraform
-    jobs:
-      - job: bootstrap
-        displayName: "Install cert-manager, ingress-nginx"
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - checkout: self
-
-          - task: AzureCLI@2
-            displayName: "Connect to AKS"
-            inputs:
-              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                az aks get-credentials --resource-group $(CLUSTER_RG) --name $(CLUSTER_NAME) --overwrite-existing
-                kubectl get nodes
-
-          - task: HelmInstaller@1
-            displayName: "Install Helm"
-            inputs:
-              helmVersionToInstall: '3.15.0'
-
-          - script: |
-              echo "🚀 Installing cert-manager..."
-              helm repo add jetstack https://charts.jetstack.io
-              helm upgrade --install cert-manager jetstack/cert-manager \
-                --namespace cert-manager --create-namespace \
-                --set crds.enabled=true
-
-              echo "🌐 Installing ingress-nginx..."
-              helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-              helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-                --namespace ingress-nginx --create-namespace \
-                --set controller.ingressClassResource.default=true \
-                --set controller.ingressClass=nginx
-
-              echo "✅ Checking deployments..."
-              kubectl get pods -A
-            displayName: "Install cert-manager and ingress-nginx"
-
-  # ================================
-  # STAGE 3 — APPLICATION DEPLOY
-  # ================================
-  - stage: Deploy
-    displayName: "Deploy MarketFlow Apps"
-    dependsOn: Bootstrap
-    jobs:
-      - job: deploy
-        displayName: "Deploy httpbin & marketflow apps"
-        pool:
-          vmImage: ubuntu-latest
-        steps:
-          - checkout: self
-
-          - task: AzureCLI@2
-            displayName: "Connect to AKS"
-            inputs:
-              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                az aks get-credentials --resource-group $(CLUSTER_RG) --name $(CLUSTER_NAME) --overwrite-existing
-
-          - script: |
-              echo "🚀 Deploying httpbin test app..."
-              kubectl create namespace httpbin --dry-run=client -o yaml | kubectl apply -f -
-              kubectl apply -f k8s/httpbin/deployment.yaml
-              kubectl apply -f k8s/httpbin/service.yaml
-              kubectl apply -f k8s/httpbin/ingress.yaml
-
-              echo "🌐 Deploying MarketFlow core apps..."
-              helm upgrade --install marketflow ./charts/marketflow \
-                --namespace marketflow --create-namespace
-            displayName: "Deploy Apps via kubectl & Helm"
-
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Apply'
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        workingDirectory: '$(TF_WORKING_DIR)'
+        environmentServiceNameAzureRM: 'marketflow-azure-connection'
+        args: '-auto-approve'
