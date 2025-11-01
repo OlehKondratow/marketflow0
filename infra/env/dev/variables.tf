@@ -29,6 +29,11 @@ variable "user_object_id" {
   type        = string
 }
 
+variable "resource_group_name" {
+  type        = string
+  description = "Azure Resource Group for the AKS cluster"
+}
+
 variable "environment" {
   type    = string
   default = "dev"
@@ -57,13 +62,14 @@ variable "ca_key_b64" {
   description = "Base64-encoded CA private key"
 }
 
-variable "resource_group_name" { type = string }
 variable "prod_ingress_ip" { type = string }
 variable "cloudflare_email" { type = string }
-variable "cloudflare_api_token" { type = string; sensitive = true }
-variable "letsencrypt_email" { type = string }
 
-variable "resource_group_name" { type = string }
+variable "cloudflare_api_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "letsencrypt_email" { type = string }
 variable "dev_ingress_ip" { type = string }
-variable "ca_crt_b64" { type = string }
-variable "ca_key_b64" { type = string; sensitive = true }
+

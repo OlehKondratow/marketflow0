@@ -1,16 +1,14 @@
-module "kubernetes_dev" {
-  source = "../../modules/kubernetes/dev"
+output "cert_manager_status" {
+  value       = helm_release.cert_manager.status
+  description = "Status of the cert-manager Helm release"
+}
 
-  resource_group_name  = azurerm_resource_group.rg.name
-  cloudflare_api_token = var.cloudflare_api_token
-  cloudflare_email     = var.cloudflare_email
-  letsencrypt_email    = var.letsencrypt_email
-  domain               = "dev.marketflow.ai"
+output "ingress_dev_status" {
+  value       = helm_release.ingress_nginx_dev.status
+  description = "Status of the dev ingress controller"
+}
 
-  providers = {
-    kubernetes = kubernetes
-    helm       = helm
-  }
-
-  depends_on = [module.aks]
+output "homelab_ca_issuer_status" {
+  value       = kubernetes_manifest.homelab_ca_issuer.manifest.metadata.name
+  description = "Name of homelab ClusterIssuer"
 }

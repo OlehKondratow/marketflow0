@@ -53,15 +53,33 @@ module "aks" {
 }
 
 module "role_assignments" {
-  source              = "../../modules/azure/role_assignments"
+  source = "../../modules/azure/role_assignments"
 
-  resource_group_id   = azurerm_resource_group.rg.id
-  keyvault_id         = module.keyvault.keyvault_id
-  acr_id              = module.acr.acr_id
+  resource_group_id = azurerm_resource_group.rg.id
+  keyvault_id       = module.keyvault.keyvault_id
+  acr_id            = module.acr.acr_id
 
   # AKS Managed Identity
-  principal_id        = module.aks.aks_identity_principal_id
-  aks_principal_id    = module.aks.aks_identity_principal_id
+  principal_id     = module.aks.aks_identity_principal_id
+  aks_principal_id = module.aks.aks_identity_principal_id
 
+  depends_on = [module.aks]
+}
+
+module "kubernetes_dev" {
+  source              = "../../modules/kubernetes/dev"
+  resource_group_name = var.resource_group_name
+  dev_ingress_ip      = var.dev_ingress_ip
+  ca_crt_b64          = var.ca_crt_b64
+  ca_key_b64          = var.ca_key_b64
+
+  cloudflare_email     = var.cloudflare_email
+  cloudflare_api_token = var.cloudflare_api_token
+  letsencrypt_email    = var.letsencrypt_email
+  domain               = "dev.ai.home"
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+  }
   depends_on = [module.aks]
 }
