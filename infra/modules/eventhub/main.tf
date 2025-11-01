@@ -4,7 +4,6 @@ resource "azurerm_eventhub_namespace" "main" {
   resource_group_name      = var.resource_group_name
   sku                      = "Standard"
   capacity                 = 1
-  kafka_enabled            = true
   auto_inflate_enabled     = true
   maximum_throughput_units = 4
 

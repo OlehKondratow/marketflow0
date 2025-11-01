@@ -27,7 +27,3 @@ variable "aks_principal_id" {
   description = "Principal ID (object ID) of the AKS Managed Identity for ACR access"
 }
 
-variable "eventhub_namespace_id" {
-  description = "ID of the Event Hub namespace for role assignment"
-  type        = string
-}

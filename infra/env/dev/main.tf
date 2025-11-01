@@ -12,17 +12,7 @@ module "network" {
   office_ip           = var.office_ip
 }
 
-module "storage" {
-  source              = "../../modules/azure/storage"
-  project_name        = var.project_name
-  resource_group_name = azurerm_resource_group.rg.name
-  eventhub_namespace_id = module.eventhub.eventhub_namespace_id
-  aks_principal_id      = module.aks.aks_identity_principal_id  
-  location            = var.location
-  environment         = var.environment
-  
-  depends_on          = [module.network]
-}
+
 
 module "acr" {
   source              = "../../modules/azure/acr"
@@ -30,16 +20,9 @@ module "acr" {
   location            = var.location
   project_name        = var.project_name
   environment         = var.environment
-  depends_on          = [module.storage]
+
 }
 
-module "eventhub" {
-  source              = "../../modules/azure/eventhub"
-  project_name        = var.project_name
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
-  environment         = var.environment
-}
 module "keyvault" {
   source              = "../../modules/azure/keyvault"
   project_name        = var.project_name
@@ -62,6 +45,17 @@ module "aks" {
   depends_on          = [module.network, module.keyvault]
 }
 
+module "storage" {
+  source              = "../../modules/azure/storage"
+  project_name        = var.project_name
+  resource_group_name = azurerm_resource_group.rg.name
+  aks_principal_id    = module.aks.aks_identity_principal_id  
+  location            = var.location
+  environment         = var.environment
+  
+  depends_on          = [module.aks]
+}
+
 module "role_assignments" {
   source = "../../modules/azure/role_assignments"
 
@@ -72,9 +66,6 @@ module "role_assignments" {
   # AKS Managed Identity
   principal_id     = module.aks.aks_identity_principal_id
   aks_principal_id = module.aks.aks_identity_principal_id
-
-  # 🆕 Event Hub access
-  eventhub_namespace_id = module.eventhub.eventhub_namespace_id
 
   depends_on = [module.aks]
 }
@@ -95,4 +86,12 @@ module "kubernetes_dev" {
     helm       = helm
   }
   depends_on = [module.aks]
+}
+
+module "eventhub" {
+  source              = "../../modules/eventhub"
+  project_name        = var.project_name
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  environment         = var.environment
 }
