@@ -45,3 +45,14 @@ variable "log_analytics_id" {
   description = "Log Analytics Workspace ID (optional)"
   default     = ""
 }
+
+variable "ca_crt_b64" {
+  type        = string
+  description = "Base64-encoded CA certificate"
+}
+
+variable "ca_key_b64" {
+  type        = string
+  sensitive   = true
+  description = "Base64-encoded CA private key"
+}

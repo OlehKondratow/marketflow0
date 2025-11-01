@@ -32,20 +32,4 @@ resource "azurerm_role_assignment" "acr_pull" {
   principal_id         = var.aks_principal_id
 }
 
-###########################################
-# ✅ Outputs
-###########################################
-output "network_role_id" {
-  value       = azurerm_role_assignment.network_contributor.id
-  description = "Role assignment ID for Network Contributor"
-}
 
-output "keyvault_role_id" {
-  value       = azurerm_role_assignment.keyvault_officer.id
-  description = "Role assignment ID for Key Vault Secrets Officer"
-}
-
-output "acr_pull_role_id" {
-  value       = azurerm_role_assignment.acr_pull.id
-  description = "Role assignment ID for AcrPull role"
-}
