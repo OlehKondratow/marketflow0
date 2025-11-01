@@ -1,23 +1,23 @@
-resource "helm_release" "ingress_nginx_dev" {
-  name             = "ingress-nginx-dev"
+resource "helm_release" "ingress_nginx_prod" {
+  name             = "ingress-nginx-prod"
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = "ingress-dev"
+  namespace        = "ingress-prod"
   create_namespace = true
 
   set {
     name  = "controller.ingressClassResource.name"
-    value = "nginx-dev"
+    value = "nginx-prod"
   }
 
   set {
     name  = "controller.ingressClassResource.controllerValue"
-    value = "k8s.io/ingress-nginx-dev"
+    value = "k8s.io/ingress-nginx-prod"
   }
 
   set {
     name  = "controller.service.loadBalancerIP"
-    value = var.dev_ingress_ip
+    value = var.prod_ingress_ip
   }
 
   set {

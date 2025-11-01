@@ -1,14 +1,8 @@
-###########################################################
-# Local CA issuer + test certificate (self-signed)
-###########################################################
-
-# Secret c CA-ключом и сертификатом
 resource "kubernetes_secret" "homelab_ca" {
   metadata {
     name      = "homelab-ca"
     namespace = "cert-manager"
   }
-
   type = "Opaque"
 
   data = {
@@ -17,23 +11,18 @@ resource "kubernetes_secret" "homelab_ca" {
   }
 }
 
-# ClusterIssuer, использующий этот Secret
 resource "kubernetes_manifest" "homelab_ca_issuer" {
   manifest = {
     apiVersion = "cert-manager.io/v1"
     kind       = "ClusterIssuer"
-    metadata = {
-      name = "homelab-ca-issuer"
-    }
+    metadata = { name = "homelab-ca-issuer" }
     spec = {
-      ca = {
-        secretName = "homelab-ca"
-      }
+      ca = { secretName = "homelab-ca" }
     }
   }
 }
 
-# Пример сертификата
+
 resource "kubernetes_manifest" "test_cert" {
   manifest = {
     apiVersion = "cert-manager.io/v1"
@@ -49,8 +38,8 @@ resource "kubernetes_manifest" "test_cert" {
       subject = {
         organizations = ["MyOrg"]
       }
-      commonName = "test-cert.dmz.home"
-      dnsNames   = ["test-cert.dmz.home"]
+      commonName = "test-cert.ai.home"
+      dnsNames   = ["test-cert.ai.home"]
       issuerRef = {
         name = "homelab-ca-issuer"
         kind = "ClusterIssuer"
