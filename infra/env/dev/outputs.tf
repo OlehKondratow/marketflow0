@@ -77,11 +77,6 @@ output "subnet_dev_id" {
   description = "Development subnet ID"
 }
 
-output "subnet_prod_id" {
-  value       = module.network.subnet_prod_id
-  description = "Production subnet ID"
-}
-
 # ───────────────────────────────
 # 💾 Storage
 # ───────────────────────────────

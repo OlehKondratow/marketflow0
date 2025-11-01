@@ -26,5 +26,3 @@ resource "azurerm_kubernetes_cluster" "aks" {
     project     = var.project_name
   }
 }
-
-

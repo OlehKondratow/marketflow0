@@ -1,10 +1,3 @@
-###########################################################
-# Outputs — Azure Network
-###########################################################
-
-###########################################################
-# Outputs — Azure Network
-###########################################################
 
 output "vnet_id" {
   value       = azurerm_virtual_network.vnet.id
@@ -36,8 +29,12 @@ output "nsg_dev_id" {
   description = "Network Security Group ID for development"
 }
 
-output "prod_ingress_ip" {
-  value       = azurerm_public_ip.prod_ingress_ip.ip_address
-  description = "Static public IP for production ingress"
+output "dev_ingress_ip" {
+  value       = azurerm_public_ip.dev_ingress_ip.ip_address
+  description = "Static public IP address for dev ingress"
 }
 
+output "prod_ingress_ip" {
+  value       = azurerm_public_ip.prod_ingress_ip.ip_address
+  description = "Static public IP address for prod ingress"
+}

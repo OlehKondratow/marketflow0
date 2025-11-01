@@ -16,8 +16,11 @@ module "storage" {
   source              = "../../modules/azure/storage"
   project_name        = var.project_name
   resource_group_name = azurerm_resource_group.rg.name
+  eventhub_namespace_id = module.eventhub.eventhub_namespace_id
+  aks_principal_id      = module.aks.aks_identity_principal_id  
   location            = var.location
   environment         = var.environment
+  
   depends_on          = [module.network]
 }
 
@@ -30,6 +33,13 @@ module "acr" {
   depends_on          = [module.storage]
 }
 
+module "eventhub" {
+  source              = "../../modules/azure/eventhub"
+  project_name        = var.project_name
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  environment         = var.environment
+}
 module "keyvault" {
   source              = "../../modules/azure/keyvault"
   project_name        = var.project_name
@@ -62,6 +72,9 @@ module "role_assignments" {
   # AKS Managed Identity
   principal_id     = module.aks.aks_identity_principal_id
   aks_principal_id = module.aks.aks_identity_principal_id
+
+  # 🆕 Event Hub access
+  eventhub_namespace_id = module.eventhub.eventhub_namespace_id
 
   depends_on = [module.aks]
 }
