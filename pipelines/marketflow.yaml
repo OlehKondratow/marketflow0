@@ -7,44 +7,48 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  TF_WORKING_DIR: 'infra/env/dev.0'
-  ARM_USE_MSI: false
+  - group: marketflow-variables     # Подключаем группу переменных
+  - name: TF_WORKING_DIR
+    value: infra/env/dev.0
 
 stages:
-- stage: Terraform_Deploy
-  displayName: 'Terraform Init & Apply'
-  jobs:
-  - job: deploy
-    displayName: 'Deploy Azure Infra'
-    steps:
-    - checkout: self
+  - stage: Terraform_Deploy
+    displayName: "Terraform Init, Plan & Apply"
+    jobs:
+      - job: terraform
+        displayName: "Deploy MarketFlow Infrastructure"
+        steps:
 
-    - task: TerraformInstaller@1
-      displayName: 'Install Terraform'
-      inputs:
-        terraformVersion: '1.9.5'
+          # 1️⃣ Установить Terraform
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: '1.8.5'
 
-    - task: TerraformTaskV4@4
-      displayName: 'Terraform Init'
-      inputs:
-        provider: 'azurerm'
-        command: 'init'
-        workingDirectory: '$(TF_WORKING_DIR)'
-        backendServiceArm: 'marketflow-azure-connection'
+          # 2️⃣ Init
+          - task: TerraformTaskV4@4
+            displayName: "Terraform Init"
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(TF_WORKING_DIR)'
+              backendServiceArm: 'marketflow-azure-connection'
 
-    - task: TerraformTaskV4@4
-      displayName: 'Terraform Plan'
-      inputs:
-        provider: 'azurerm'
-        command: 'plan'
-        workingDirectory: '$(TF_WORKING_DIR)'
-        environmentServiceNameAzureRM: 'marketflow-azure-connection'
+          # 3️⃣ Plan
+          - task: TerraformTaskV4@4
+            displayName: "Terraform Plan"
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(TF_WORKING_DIR)'
+              environmentServiceNameAzureRM: 'marketflow-azure-connection'
+              commandOptions: '-out=tfplan'
 
-    - task: TerraformTaskV4@4
-      displayName: 'Terraform Apply'
-      inputs:
-        provider: 'azurerm'
-        command: 'apply'
-        workingDirectory: '$(TF_WORKING_DIR)'
-        environmentServiceNameAzureRM: 'marketflow-azure-connection'
-        args: '-auto-approve'
+          # 4️⃣ Apply
+          - task: TerraformTaskV4@4
+            displayName: "Terraform Apply"
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(TF_WORKING_DIR)'
+              environmentServiceNameAzureRM: 'marketflow-azure-connection'
+              commandOptions: 'tfplan'

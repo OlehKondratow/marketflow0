@@ -7,7 +7,7 @@ terraform.tfvars
 .terraform/
 .terraform.lock.hcl
 tfplan
-
+.cred
 
 k8s/alloy.sh
 
