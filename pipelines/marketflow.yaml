@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: marketflow-variables     # Подключаем группу переменных
+  - group: marketflow-secrets
   - name: TF_WORKING_DIR
     value: infra/env/dev.0
 
