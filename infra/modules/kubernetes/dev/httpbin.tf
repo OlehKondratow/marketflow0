@@ -2,17 +2,6 @@
 # Demo Application (httpbin) with TLS ingress for DEV
 ###########################################################
 
-# Namespace for dev environment
-resource "kubernetes_namespace" "marketflow_dev" {
-  metadata {
-    name = "marketflow-dev"
-    labels = {
-      environment = "dev"
-      project     = "marketflow"
-    }
-  }
-}
-
 # Deployment
 resource "kubernetes_deployment" "httpbin" {
   metadata {

@@ -4,6 +4,9 @@ resource "helm_release" "ingress_nginx_dev" {
   chart            = "ingress-nginx"
   namespace        = "ingress-dev"
   create_namespace = true
+  timeout = 900
+  force_update = true
+  replace = true
 
   set = [
     {

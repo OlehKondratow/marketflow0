@@ -1,3 +1,6 @@
+##############################################################
+# 🌐 Virtual Network and Subnets
+##############################################################
 resource "azurerm_virtual_network" "vnet" {
   name                = "${var.project_name}-vnet"
   location            = var.location
@@ -24,6 +27,9 @@ resource "azurerm_subnet" "subnet_dev" {
   address_prefixes     = ["10.240.2.0/24"]
 }
 
+##############################################################
+# 🔒 Network Security Groups
+##############################################################
 resource "azurerm_network_security_group" "prod_nsg" {
   name                = "${var.project_name}-prod-nsg"
   location            = var.location
@@ -85,11 +91,31 @@ resource "azurerm_network_security_group" "dev_nsg" {
   }
 }
 
+##############################################################
+# 🌍 Public IPs for Ingress Controllers
+##############################################################
+resource "azurerm_public_ip" "dev_ingress_ip" {
+  name                = "${var.project_name}-dev-ip"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = {
+    environment = "dev"
+    managed_by  = "terraform"
+  }
+}
+
 resource "azurerm_public_ip" "prod_ingress_ip" {
   name                = "${var.project_name}-prod-ip"
   location            = var.location
   resource_group_name = var.resource_group_name
   allocation_method   = "Static"
   sku                 = "Standard"
-}
 
+  tags = {
+    environment = "prod"
+    managed_by  = "terraform"
+  }
+}
