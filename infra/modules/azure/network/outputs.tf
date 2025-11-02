@@ -28,13 +28,3 @@ output "nsg_dev_id" {
   value       = azurerm_network_security_group.dev_nsg.id
   description = "Network Security Group ID for development"
 }
-
-output "dev_ingress_ip" {
-  value       = azurerm_public_ip.dev_ingress_ip.ip_address
-  description = "Static public IP address for dev ingress"
-}
-
-output "prod_ingress_ip" {
-  value       = azurerm_public_ip.prod_ingress_ip.ip_address
-  description = "Static public IP address for prod ingress"
-}

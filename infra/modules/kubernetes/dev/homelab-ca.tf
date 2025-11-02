@@ -3,11 +3,11 @@ resource "kubernetes_secret" "homelab_ca" {
     name      = "homelab-ca"
     namespace = "cert-manager"
   }
-  type = "Opaque"
+  type = "kubernetes.io/tls"
 
   data = {
-    "ca.crt" = var.ca_crt_b64
-    "ca.key" = var.ca_key_b64
+    "tls.crt" = base64decode(var.ca_crt_b64)
+    "tls.key" = base64decode(var.ca_key_b64)
   }
 }
 

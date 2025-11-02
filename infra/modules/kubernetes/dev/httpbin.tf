@@ -92,7 +92,7 @@ resource "kubernetes_ingress_v1" "httpbin" {
     }
 
     tls {
-      hosts       = ["httpbin.dev.ai.home"]
+      hosts       = ["httpbin.ai.home"]
       secret_name = "httpbin-tls"
     }
   }

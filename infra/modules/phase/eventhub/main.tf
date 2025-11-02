@@ -15,32 +15,28 @@ resource "azurerm_eventhub_namespace" "main" {
 
 resource "azurerm_eventhub" "ohlcv_raw" {
   name                = "ohlcv-raw"
-  namespace_name      = azurerm_eventhub_namespace.main.name
-  resource_group_name = var.resource_group_name
+  namespace_id = azurerm_eventhub_namespace.main.id
   partition_count     = 4
   message_retention   = 7
 }
 
 resource "azurerm_eventhub" "ohlcv_clean" {
   name                = "ohlcv-clean"
-  namespace_name      = azurerm_eventhub_namespace.main.name
-  resource_group_name = var.resource_group_name
+  namespace_id = azurerm_eventhub_namespace.main.id
   partition_count     = 4
   message_retention   = 7
 }
 
 resource "azurerm_eventhub" "ohlcv_signals" {
   name                = "ohlcv-signals"
-  namespace_name      = azurerm_eventhub_namespace.main.name
-  resource_group_name = var.resource_group_name
+  namespace_id = azurerm_eventhub_namespace.main.id
   partition_count     = 4
   message_retention   = 7
 }
 
 resource "azurerm_eventhub" "alerts" {
   name                = "alerts"
-  namespace_name      = azurerm_eventhub_namespace.main.name
-  resource_group_name = var.resource_group_name
+  namespace_id = azurerm_eventhub_namespace.main.id
   partition_count     = 4
   message_retention   = 7
 }

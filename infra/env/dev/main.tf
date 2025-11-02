@@ -49,11 +49,11 @@ module "storage" {
   source              = "../../modules/azure/storage"
   project_name        = var.project_name
   resource_group_name = azurerm_resource_group.rg.name
-  aks_principal_id    = module.aks.aks_identity_principal_id  
+  aks_principal_id    = module.aks.aks_identity_principal_id
   location            = var.location
   environment         = var.environment
-  
-  depends_on          = [module.aks]
+
+  depends_on = [module.aks]
 }
 
 module "kubernetes_dev" {
@@ -81,7 +81,7 @@ module "role_assignments" {
   keyvault_id       = module.keyvault.keyvault_id
   acr_id            = module.acr.acr_id
 
-  # AKS Managed Identity
+  #AKS Managed Identity
   principal_id     = module.aks.aks_identity_principal_id
   aks_principal_id = module.aks.aks_identity_principal_id
 

@@ -91,31 +91,3 @@ resource "azurerm_network_security_group" "dev_nsg" {
   }
 }
 
-##############################################################
-# 🌍 Public IPs for Ingress Controllers
-##############################################################
-resource "azurerm_public_ip" "dev_ingress_ip" {
-  name                = "${var.project_name}-dev-ip"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-
-  tags = {
-    environment = "dev"
-    managed_by  = "terraform"
-  }
-}
-
-resource "azurerm_public_ip" "prod_ingress_ip" {
-  name                = "${var.project_name}-prod-ip"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-
-  tags = {
-    environment = "prod"
-    managed_by  = "terraform"
-  }
-}

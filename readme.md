@@ -19,3 +19,7 @@ subnet_dev_id = "/subscriptions/65fe7e97-9f6f-4f82-b940-4f374ca027cb/resourceGro
 subnet_prod_id = "/subscriptions/65fe7e97-9f6f-4f82-b940-4f374ca027cb/resourceGroups/marketflow0-rg/providers/Microsoft.Network/virtualNetworks/marketflow0-vnet/subnets/aks-subnet-prod"
 vnet_id = "/subscriptions/65fe7e97-9f6f-4f82-b940-4f374ca027cb/resourceGroups/marketflow0-rg/providers/Microsoft.Network/virtualNetworks/marketflow0-vnet"
 ```
+
+terraform apply -target=module.kubernetes_dev.helm_release.cert_manager
+terraform apply -target=module.kubernetes_dev.kubernetes_manifest.homelab_ca_issuer
+terraform apply -target=module.kubernetes_dev.kubernetes_manifest.letsencrypt_staging
