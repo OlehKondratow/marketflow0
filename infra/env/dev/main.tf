@@ -78,7 +78,7 @@ module "kubernetes_prod" {
   cloudflare_email     = var.cloudflare_email
   cloudflare_api_token = var.cloudflare_api_token
   letsencrypt_email    = var.letsencrypt_email
-
+  domain               = "marketflow.okondratov.online"
   providers = {
     kubernetes = kubernetes
     helm       = helm
