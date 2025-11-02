@@ -1,12 +1,8 @@
-###########################################################
-# Demo Application (httpbin) with TLS ingress for DEV
-###########################################################
-
 # Deployment
 resource "kubernetes_deployment" "httpbin" {
   metadata {
     name      = "httpbin"
-    namespace = kubernetes_namespace.marketflow_dev.metadata[0].name
+    namespace = kubernetes_namespace.marketflow_prod.metadata[0].name
     labels = {
       app = "httpbin"
     }
@@ -44,7 +40,7 @@ resource "kubernetes_deployment" "httpbin" {
 resource "kubernetes_service" "httpbin" {
   metadata {
     name      = "httpbin"
-    namespace = kubernetes_namespace.marketflow_dev.metadata[0].name
+    namespace = kubernetes_namespace.marketflow_prod.metadata[0].name
   }
 
   spec {
@@ -65,16 +61,16 @@ resource "kubernetes_service" "httpbin" {
 resource "kubernetes_ingress_v1" "httpbin" {
   metadata {
     name      = "httpbin"
-    namespace = kubernetes_namespace.marketflow_dev.metadata[0].name
+    namespace = kubernetes_namespace.marketflow_prod.metadata[0].name
     annotations = {
-      "kubernetes.io/ingress.class"    = "nginx-dev"
-      "cert-manager.io/cluster-issuer" = "homelab-ca-issuer"
+      "kubernetes.io/ingress.class"    = "nginx-prod"
+      "cert-manager.io/cluster-issuer" = "letsencrypt-staging" # или letsencrypt-prod
     }
   }
 
   spec {
     rule {
-      host = "httpbin.ai.home"
+      host = "httpbin.okondratov.online"
       http {
         path {
           path      = "/"
@@ -92,8 +88,10 @@ resource "kubernetes_ingress_v1" "httpbin" {
     }
 
     tls {
-      hosts       = ["httpbin.ai.home"]
-      secret_name = "httpbin-tls"
+      hosts       = ["httpbin.okondratov.online"]
+      secret_name = "httpbin-prod-tls"
     }
   }
+
+  depends_on = [helm_release.ingress_nginx_prod]
 }
