@@ -23,3 +23,11 @@ vnet_id = "/subscriptions/65fe7e97-9f6f-4f82-b940-4f374ca027cb/resourceGroups/ma
 terraform apply -target=module.kubernetes_dev.helm_release.cert_manager
 terraform apply -target=module.kubernetes_dev.kubernetes_manifest.homelab_ca_issuer
 terraform apply -target=module.kubernetes_dev.kubernetes_manifest.letsencrypt_staging
+
+```
+az network public-ip list --resource-group marketflow0-rg --output table
+Name                 ResourceGroup    Location     Zones    Address        IdleTimeoutInMinutes    ProvisioningState
+-------------------  ---------------  -----------  -------  -------------  ----------------------  -------------------
+marketflow0-dev-ip   marketflow0-rg   northeurope           4.210.65.14    4                       Succeeded
+marketflow0-prod-ip  marketflow0-rg   northeurope           128.251.42.38  4                       Succeeded
+```

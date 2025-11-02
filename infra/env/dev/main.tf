@@ -63,9 +63,6 @@ module "kubernetes_dev" {
   ca_crt_b64          = var.ca_crt_b64
   ca_key_b64          = var.ca_key_b64
 
-  cloudflare_email     = var.cloudflare_email
-  cloudflare_api_token = var.cloudflare_api_token
-  letsencrypt_email    = var.letsencrypt_email
   domain               = "dev.ai.home"
   providers = {
     kubernetes = kubernetes
@@ -73,6 +70,23 @@ module "kubernetes_dev" {
   }
   depends_on = [module.aks]
 }
+
+module "kubernetes_prod" {
+  source              = "../../modules/kubernetes/prod"
+  prod_ingress_ip     = var.prod_ingress_ip
+
+  cloudflare_email     = var.cloudflare_email
+  cloudflare_api_token = var.cloudflare_api_token
+  letsencrypt_email    = var.letsencrypt_email
+
+  providers = {
+    kubernetes = kubernetes
+    helm       = helm
+  }
+
+  depends_on = [module.aks]
+}
+
 
 module "role_assignments" {
   source = "../../modules/phase/role_assignments"
